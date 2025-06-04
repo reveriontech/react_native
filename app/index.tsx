@@ -3,12 +3,24 @@ import { colors } from '@/utils/colors';
 import { fontSizes } from '@/utils/sizes';
 import { router } from 'expo-router';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 
 export default function Intro() {
-    const handleStartTimer = () => {
-        router.push('/timepage');
+    const [loading, setLoading] = React.useState(false);
+
+    const handleStartTimer = async () => {
+
+        // This is for loading 
+        setLoading(true);
+        try {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            router.push('/timepage');
+        } catch (error) {
+            console.error('Navigation error:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -22,14 +34,19 @@ export default function Intro() {
                 </Text>
             </View>
             <View style={styles.buttonContainer}>
-                 <Button
-                    // style={styles.button}
-                    onPress={handleStartTimer} 
-                    title="Proceed" 
-                    textColor={colors.white}
-                    backgroundColor={colors.progressBar}
-                    width={100}
-                    />
+                {loading ? (
+                    <View style={styles.loaderContainer}>
+                        <ActivityIndicator size={fontSizes.xxl} color="#0000ff" />
+                    </View>
+                    ) : (
+                    <Button
+                        onPress={handleStartTimer} 
+                        title="Proceed" 
+                        textColor={colors.white}
+                        backgroundColor={colors.progressBar}
+                        width={100}
+                   />
+                )}
             </View>
            
         </View>
@@ -44,7 +61,7 @@ const styles = StyleSheet.create({
         backgroundColor: colors.lightRed
     },
     textContainer: {    
-        marginBottom: 20,
+        marginBottom: 300,
         paddingHorizontal: 20,
         gap: 5,
         alignItems: 'center',
@@ -62,8 +79,15 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     buttonContainer: {
-        paddingTop: 200,
+        position: 'absolute',
+        bottom: '20%',
         width: '100%',
+        alignItems: 'center',
+    },
+    loaderContainer: {
+        width: 100, 
+        height: 40,
+        justifyContent: 'center',
         alignItems: 'center',
     },
    
